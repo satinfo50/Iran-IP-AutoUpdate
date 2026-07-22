@@ -25,18 +25,8 @@ with open("data/ripe-response.json", "wb") as f:
 data = json.loads(raw)
 
 
-print("JSON keys:")
-print(data.keys())
 
-
-if "resources" not in data:
-    print("No resources key found")
-    print(json.dumps(data, indent=2)[:2000])
-    exit(1)
-
-
-ips = data["resources"].get("ipv4", [])
-
+ips = data["data"]["resources"].get("ipv4", [])
 
 print("IPv4 count:", len(ips))
 
