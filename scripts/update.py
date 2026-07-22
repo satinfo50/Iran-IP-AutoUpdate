@@ -3,7 +3,7 @@ import urllib.request
 import urllib.error
 
 
-URL = "https://raw.githubusercontent.com/HotCakeX/Official-IANA-IP-blocks/main/IR/IPv4.txt"
+URL = "https://raw.githubusercontent.com/HotCakeX/Official-IANA-IP-blocks/main/TXT/IPV4/IR.txt"
 
 
 os.makedirs("data", exist_ok=True)
