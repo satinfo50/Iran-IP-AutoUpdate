@@ -1,5 +1,6 @@
-name: Update Iran IP List
-
+- name: Install requirements
+  run: |
+    pip install beautifulsoup4
 on:
   schedule:
     - cron: "0 2 * * *"
