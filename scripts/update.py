@@ -4,8 +4,7 @@ import difflib
 import urllib.error
 
 
-URL = "https://hotcakex.github.io/Official-IANA-IP-blocks/IR/IPv4.txt"
-
+URL = "https://raw.githubusercontent.com/HotCakeX/Official-IANA-IP-blocks/main/TXT/IR/IPv4.txt"
 
 os.makedirs("data", exist_ok=True)
 os.makedirs("output", exist_ok=True)
@@ -18,17 +17,14 @@ new_file = "data/current.txt"
 # دانلود لیست جدید
 
 print("Downloading...")
+print(URL)
 
-try:
-    urllib.request.urlretrieve(
-        URL,
-        new_file
-    )
-
-except urllib.error.HTTPError as e:
-    print("Download failed:", e)
-    exit(1)
+urllib.request.urlretrieve(
+    URL,
+    new_file
 )
+
+print("Downloaded successfully")
 
 
 # خواندن لیست قبلی
