@@ -1,9 +1,10 @@
 import os
 import urllib.request
 import difflib
+import urllib.error
 
 
-URL = "https://raw.githubusercontent.com/HotCakeX/Official-IANA-IP-blocks/main/IPv4/IR.txt"
+URL = "https://hotcakex.github.io/Official-IANA-IP-blocks/IR/IPv4.txt"
 
 
 os.makedirs("data", exist_ok=True)
@@ -18,9 +19,15 @@ new_file = "data/current.txt"
 
 print("Downloading...")
 
-urllib.request.urlretrieve(
-    URL,
-    new_file
+try:
+    urllib.request.urlretrieve(
+        URL,
+        new_file
+    )
+
+except urllib.error.HTTPError as e:
+    print("Download failed:", e)
+    exit(1)
 )
 
 
