@@ -1,5 +1,6 @@
 import os
 import urllib.request
+import difflib
 
 
 URL = "https://raw.githubusercontent.com/HotCakeX/Official-IANA-IP-blocks/main/IPv4/IR.txt"
@@ -9,34 +10,116 @@ os.makedirs("data", exist_ok=True)
 os.makedirs("output", exist_ok=True)
 
 
-print("Downloading Iran IP list...")
+old_file = "data/previous.txt"
+new_file = "data/current.txt"
+
+
+# دانلود لیست جدید
+
+print("Downloading...")
 
 urllib.request.urlretrieve(
     URL,
-    "data/current.txt"
+    new_file
 )
 
 
-print("Download finished")
+# خواندن لیست قبلی
+
+old_ips = []
+
+if os.path.exists(old_file):
+    with open(old_file) as f:
+        old_ips = [
+            x.strip()
+            for x in f.readlines()
+            if x.strip()
+        ]
 
 
-with open("data/current.txt") as f:
-    ips = f.read().splitlines()
+# خواندن لیست جدید
+
+with open(new_file) as f:
+    new_ips = [
+        x.strip()
+        for x in f.readlines()
+        if x.strip()
+    ]
 
 
-with open("output/iran-full.rsc","w") as f:
+old_set = set(old_ips)
+new_set = set(new_ips)
+
+
+added = sorted(new_set - old_set)
+removed = sorted(old_set - new_set)
+
+
+
+print("Added:", len(added))
+print("Removed:", len(removed))
+
+
+
+# ساخت فایل کامل
+
+with open(
+    "output/iran-full.rsc",
+    "w"
+) as f:
 
     f.write("/ip firewall address-list\n")
 
-    for ip in ips:
+    for ip in new_ips:
 
-        if ip.strip():
-
-            f.write(
-                'add list=Iran address='
-                + ip.strip()
-                + ' comment="AUTO-IANA"\n'
-            )
+        f.write(
+            'add list=Iran address='
+            + ip
+            + ' comment="AUTO-IANA"\n'
+        )
 
 
-print("RSC generated")
+
+# ساخت فایل تغییرات
+
+with open(
+    "output/iran-update.rsc",
+    "w"
+) as f:
+
+
+    f.write("/ip firewall address-list\n\n")
+
+
+    for ip in removed:
+
+        f.write(
+            ':do {remove [find list=Iran address="'
+            + ip
+            + '"]} on-error={}\n'
+        )
+
+
+    for ip in added:
+
+        f.write(
+            'add list=Iran address='
+            + ip
+            + ' comment="AUTO-IANA"\n'
+        )
+
+
+
+# ذخیره نسخه جدید برای فردا
+
+with open(
+    old_file,
+    "w"
+) as f:
+
+    for ip in new_ips:
+        f.write(ip+"\n")
+
+
+
+print("Done")
