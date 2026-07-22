@@ -1,48 +1,45 @@
 import os
+import json
 import urllib.request
-from bs4 import BeautifulSoup
+
+
+API = "https://stat.ripe.net/data/country-resource-list/data.json?resource=ir&v4_format=prefix"
 
 
 os.makedirs("data", exist_ok=True)
 os.makedirs("output", exist_ok=True)
 
 
-PAGE = "https://hotcakex.github.io/Official-IANA-IP-blocks/"
+print("Downloading Iran IP list...")
 
 
-print("Reading page...")
-
-html = urllib.request.urlopen(PAGE).read()
-
-soup = BeautifulSoup(html, "html.parser")
+with urllib.request.urlopen(API) as response:
+    data = json.loads(response.read())
 
 
-url = None
-
-for a in soup.find_all("a"):
-    text = a.text.strip()
-
-    if text == "TXT":
-        href = a.get("href")
-
-        if href and "IR" in href:
-            url = href
-            break
+ips = data["resources"]["ipv4"]
 
 
-if not url:
-    print("Iran TXT link not found")
-    exit(1)
+print("IPv4 count:", len(ips))
 
 
-print("Downloading:")
-print(url)
+with open("data/current.txt", "w") as f:
+    for ip in ips:
+        f.write(ip + "\n")
 
 
-urllib.request.urlretrieve(
-    url,
-    "data/current.txt"
-)
+
+with open("output/iran-full.rsc", "w") as f:
+
+    f.write("/ip firewall address-list\n")
+
+    for ip in ips:
+
+        f.write(
+            'add list=Iran address='
+            + ip
+            + ' comment="AUTO-RIPE"\n'
+        )
 
 
-print("Download OK")
+print("iran-full.rsc created")
