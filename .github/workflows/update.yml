@@ -1,35 +1,53 @@
-- name: Install requirements
-  run: |
-    pip install beautifulsoup4
+name: Update Iran IP List
+
 on:
   schedule:
     - cron: "0 2 * * *"
 
   workflow_dispatch:
 
+
 jobs:
+
   update:
+
     runs-on: ubuntu-latest
+
 
     steps:
 
-    - name: Checkout
+    - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Python
+
+    - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: "3.x"
+
+
+    - name: Install requirements
+      run: |
+        pip install beautifulsoup4
+
 
     - name: Run updater
       run: |
         python scripts/update.py
 
+
     - name: Commit changes
       run: |
+
         git config --global user.name "github-actions"
+
         git config --global user.email "actions@github.com"
 
+
         git add .
+
+
         git commit -m "Automatic Iran IP update" || exit 0
+
+
         git push
